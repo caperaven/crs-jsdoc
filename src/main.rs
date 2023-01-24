@@ -5,6 +5,9 @@ use args::get_args;
 use std::env;
 use crate::args::Args;
 
+/**
+* Entry point of the application
+*/
 fn main() {
     let def = get_args();
 
