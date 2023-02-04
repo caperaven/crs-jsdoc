@@ -1,11 +1,16 @@
 mod args;
 mod process_file;
+mod markdown_generator;
 
 use args::{get_args, Args};
 use std::env;
+use markdown_generator::MarkdownGenerator;
 
 /**
+* @function main
 * Entry point of the application
+* @example <caption>Running the application to process a file</caption>
+* cargo run file src/main.rs
 */
 fn main() {
     let def = get_args();
@@ -22,6 +27,7 @@ fn main() {
 }
 
 /**
+* @function process_file
 * Process a file's content line by line
 * Generate a output file based on the jsdoc comments
 * @param args_def The arguments passed to the application from the commandline
@@ -31,13 +37,19 @@ fn process_file(args_def: args::Args) {
 
     let current_dir = env::current_dir().expect("could not get current directory");
     let file_path = current_dir.join(file.unwrap());
+    let mut markdown_generator = MarkdownGenerator::new();
 
-    process_file::read(file_path, |line| {
-        println!("{}", line);
-    });
+    let mut process_line = |line: String| {
+        markdown_generator.process_line(line);
+    };
+
+    process_file::read(file_path, &mut process_line);
+
+    markdown_generator.generate();
 }
 
 /**
+* @function process_folder
 * Process the files in the folder recursively.
 * For each file in the folder call process_file.
 * Call this function recursively for each subfolder.

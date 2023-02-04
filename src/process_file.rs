@@ -8,7 +8,10 @@ use std::path::PathBuf;
 * @param file_path The path to the file
 * @param callback The callback function
 */
-pub fn read(file_path: PathBuf, callback: fn(String)) {
+pub fn read<F>(file_path: PathBuf, callback: &mut F)
+    where
+        F: FnMut(String),
+{
     match File::open(file_path) {
         Ok(file) => {
             let reader = BufReader::new(file);
