@@ -45,7 +45,8 @@ fn process_file(args_def: args::Args) {
 
     process_file::read(file_path, &mut process_line);
 
-    markdown_generator.generate();
+    let result = markdown_generator.generate();
+    println!("{:?}", result);
 }
 
 /**
