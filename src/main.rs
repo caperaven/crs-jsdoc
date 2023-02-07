@@ -26,6 +26,15 @@ fn main() {
     }
 }
 
+fn save_file(args_def: &Args, content: String, file: String) {
+    let destination = args_def.destination.as_ref().unwrap().clone();
+    let current_dir = env::current_dir().expect("could not get current directory");
+    let file_path = current_dir.join(destination).join(file.replace(".js", ".md").replace(".rs", ".md"));
+
+    println!("Saving file: {}", file_path.to_str().unwrap());
+
+    process_file::write(file_path, content);
+}
 /**
 * @function process_file
 * Process a file's content line by line
@@ -33,10 +42,10 @@ fn main() {
 * @param args_def The arguments passed to the application from the commandline
 */
 fn process_file(args_def: args::Args) {
-    let file = args_def.file;
+    let file = args_def.file.as_ref().unwrap().clone();
 
     let current_dir = env::current_dir().expect("could not get current directory");
-    let file_path = current_dir.join(file.unwrap());
+    let file_path = current_dir.join(file.clone());
     let mut markdown_generator = MarkdownGenerator::new();
 
     let mut process_line = |line: String| {
@@ -46,7 +55,7 @@ fn process_file(args_def: args::Args) {
     process_file::read(file_path, &mut process_line);
 
     let result = markdown_generator.generate();
-    println!("{:?}", result);
+    save_file(&args_def, result, file);
 }
 
 /**

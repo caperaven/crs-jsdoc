@@ -13,10 +13,18 @@ pub struct Args {
 pub(crate) fn get_args() -> Args {
     let args: Vec<String> = std::env::args().collect();
 
+    let file = get_values_from_args(&args, "file");
+    let folder = get_values_from_args(&args, "folder");
+    let mut destination = get_values_from_args(&args, "dest");
+
+    if destination.is_none() {
+        destination = Some("documents".to_string());
+    }
+
     Args {
-        file: get_values_from_args(&args, "file"),
-        folder: get_values_from_args(&args, "folder"),
-        destination: get_values_from_args(&args, "dest"),
+        file,
+        folder,
+        destination
     }
 }
 
