@@ -1,6 +1,7 @@
 mod args;
 mod process_file;
 mod markdown_generator;
+mod parameters;
 
 use args::{get_args, Args};
 use std::env;
@@ -35,11 +36,12 @@ fn save_file(args_def: &Args, content: String, file: String) {
 
     process_file::write(file_path, content);
 }
+
 /**
 * @function process_file
 * Process a file's content line by line
 * Generate a output file based on the jsdoc comments
-* @param args_def The arguments passed to the application from the commandline
+* @param args_def {args::Args} - The arguments passed to the application from the commandline
 */
 fn process_file(args_def: args::Args) {
     let file = args_def.file.as_ref().unwrap().clone();
@@ -63,8 +65,8 @@ fn process_file(args_def: args::Args) {
 * Process the files in the folder recursively.
 * For each file in the folder call process_file.
 * Call this function recursively for each subfolder.
-* @param args_def The arguments passed to the application from the commandline
-* @param path The path to the folder that will determine the output folder
+* @param args_def {Args} - The arguments passed to the application from the commandline
+* @param path {String} - The path to the folder that will determine the output folder
 */
 fn process_folder(args_def: args::Args, path: &str) {
     todo!()

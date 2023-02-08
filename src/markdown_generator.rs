@@ -1,3 +1,5 @@
+use crate::parameters;
+
 // Enum to hold different markdown states
 #[derive(Debug, PartialEq)]
 enum MarkdownGeneratorState {
@@ -52,8 +54,6 @@ impl MarkdownGenerator {
     }
 
     pub fn generate(&mut self) -> String {
-        self.current_state = MarkdownGeneratorState::None;
-
         let mut output: Vec<String> = vec![];
 
         for (index, line) in self.lines.iter().enumerate() {
@@ -62,8 +62,6 @@ impl MarkdownGenerator {
             if line.starts_with("/") {
                 continue;
             }
-
-            println!("{}: {}", index, line);
 
             if line.starts_with("@class") {
                 line = line.replace("@class", "").trim().to_string();
@@ -84,6 +82,21 @@ impl MarkdownGenerator {
             }
 
             if line.starts_with("@param") {
+                line = line.replace("@param", "").trim().to_string();
+
+                if self.current_state != MarkdownGeneratorState::Parameters {
+                    output.push("\r".to_string());
+                    output.push("***parameters***".to_string());
+                    output.push("\r".to_string());
+                    output.push("|parameter|type|description|required|default|".to_string());
+                    output.push("|---------|----|-----------|--------|-------|".to_string());
+                }
+
+                self.current_state = MarkdownGeneratorState::Parameters;
+
+                line = line.replace("@param", "").trim().to_string();
+                md_parameters(line.clone(), &mut output);
+
                 continue;
             }
 
@@ -92,6 +105,8 @@ impl MarkdownGenerator {
             }
 
             if line.starts_with("@returns") {
+                line = line.replace("@returns", "").trim().to_string();
+                output.push(format!("**Returns**: {}", line));
                 continue;
             }
 
@@ -109,4 +124,15 @@ fn md_headings(line: String, output: &mut Vec<String>, heading_text: &str) {
     heading.push(parts[0].trim());
 
     output.push(heading.join(" "));
+}
+
+fn md_parameters(line: String, output: &mut Vec<String>) {
+    let param = parameters::Parameters::new(line.clone());
+
+    output.push(format!("|{}|{}|{}|{}|{}|",
+        param.param_name,
+        param.param_type,
+        param.param_description,
+        param.param_required,
+        param.param_default));
 }
