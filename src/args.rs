@@ -1,6 +1,7 @@
 /**
  * The structure that holds the commandline arguments
  */
+#[derive(Debug, Clone)]
 pub struct Args {
     pub file: Option<String>,
     pub folder: Option<String>,

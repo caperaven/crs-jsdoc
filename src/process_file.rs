@@ -27,6 +27,11 @@ pub fn read<F>(file_path: PathBuf, callback: &mut F)
     }
 }
 
+/**
+* @function write - Write a file to the file system
+* @param file_path - The path to the file
+* @param content - The content of the file
+*/
 pub fn write(file_path: PathBuf, content: String) {
     let file_path_str = file_path.to_str().unwrap();
     let file_path_fixed = file_path_str.replace("/", "\\");
@@ -44,8 +49,6 @@ pub fn write(file_path: PathBuf, content: String) {
 }
 
 fn ensure_directories_exist(path: PathBuf) -> Result<(), std::io::Error> {
-    println!("Creating directory: {}", path.to_str().unwrap());
-
     let folderPath = path.parent().expect("could not get parent folder for path").to_path_buf();
     fs::create_dir_all(folderPath)?;
     Ok(())
