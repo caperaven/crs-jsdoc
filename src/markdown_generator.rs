@@ -8,15 +8,19 @@ enum MarkdownGeneratorState {
     // We are processing a comment block that will be part of the documentation
     Comment,
 
-    // Processing the @function block or @class block or @method block
-    Heading,
-
     // Processing parameters, @param
     Parameters,
 
     // Example block @example <caption>Example</caption>
     Example
 
+}
+
+#[derive(Debug, PartialEq)]
+enum ExampleType {
+    js,
+    json,
+    html
 }
 
 pub struct MarkdownGenerator {
@@ -57,6 +61,7 @@ impl MarkdownGenerator {
         let mut output: Vec<String> = vec![];
 
         for (index, line) in self.lines.iter().enumerate() {
+            let original_line = line.clone();
             let mut line = line.trim().replace("*", "").trim().to_string();
 
             if line.starts_with("/") {
@@ -64,24 +69,32 @@ impl MarkdownGenerator {
             }
 
             if line.starts_with("@class") {
+                md_close_status(&mut output, &self.current_state);
+
                 line = line.replace("@class", "").trim().to_string();
                 md_headings(line.clone(), &mut output, "# class");
                 continue;
             }
 
             if line.starts_with("@method") {
+                md_close_status(&mut output, &self.current_state);
+
                 line = line.replace("@method", "").trim().to_string();
                 md_headings(line.clone(), &mut output, "## method");
                 continue;
             }
 
             if line.starts_with("@function") {
+                md_close_status(&mut output, &self.current_state);
+
                 line = line.replace("@function", "").trim().to_string();
                 md_headings(line.clone(), &mut output, "## function");
                 continue;
             }
 
             if line.starts_with("@param") {
+                md_close_status(&mut output, &self.current_state);
+
                 line = line.replace("@param", "").trim().to_string();
 
                 if self.current_state != MarkdownGeneratorState::Parameters {
@@ -101,19 +114,37 @@ impl MarkdownGenerator {
             }
 
             if line.starts_with("@example") {
+                md_close_status(&mut output, &self.current_state);
+
+                self.current_state = MarkdownGeneratorState::Example;
+                line = line.replace("@example", "").trim().to_string();
+                md_example(line.clone(), &mut output);
                 continue;
             }
 
             if line.starts_with("@returns") {
+                md_close_status(&mut output, &self.current_state);
+
                 line = line.replace("@returns", "").trim().to_string();
                 output.push(format!("**Returns**: {}", line));
                 continue;
             }
 
-            output.push(line.clone());
+            output.push(original_line.replace("*", ""));
         }
 
         return output.join("\r");
+    }
+}
+
+fn md_close_status(output: &mut Vec<String>, status: &MarkdownGeneratorState) {
+    match status {
+        MarkdownGeneratorState::Example => {
+            output.push("```".to_string());
+        }
+        _ => {
+            return;
+        }
     }
 }
 
@@ -135,4 +166,31 @@ fn md_parameters(line: String, output: &mut Vec<String>) {
         param.param_description,
         param.param_required,
         param.param_default));
+}
+
+fn md_example(line: String, output: &mut Vec<String>) {
+    let heading = line.replace("<caption>", "").replace("</caption>", "").trim().to_string();
+    output.push(format!("***Example: {}***", heading));
+
+    let mut example_type = ExampleType::js;
+
+    if heading.to_lowercase().contains("json") {
+        example_type = ExampleType::json;
+    }
+
+    if heading.to_lowercase().contains("html") {
+        example_type = ExampleType::html;
+    }
+
+    match example_type {
+        ExampleType::js => {
+            output.push("```js".to_string());
+        }
+        ExampleType::json => {
+            output.push("```json".to_string());
+        }
+        ExampleType::html => {
+            output.push("```html".to_string());
+        }
+    }
 }
