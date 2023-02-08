@@ -306,7 +306,7 @@ export class ColorsActions {
     }
 
     /**
-     * Gets a css variables from an element, converts it to a hex string, then converts that hex string to a normalized hex string
+     * @method css_to_normalized - Gets a css variables from an element, converts it to a hex string, then converts that hex string to a normalized hex string
      * @param step - The step object from the pipeline
      * @param context - The context of the current step.
      * @param process - The process object
