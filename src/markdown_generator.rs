@@ -18,9 +18,9 @@ enum MarkdownGeneratorState {
 
 #[derive(Debug, PartialEq)]
 enum ExampleType {
-    js,
-    json,
-    html
+    Js,
+    Json,
+    Html
 }
 
 pub struct MarkdownGenerator {
@@ -60,7 +60,7 @@ impl MarkdownGenerator {
     pub fn generate(&mut self) -> String {
         let mut output: Vec<String> = vec![];
 
-        for (index, line) in self.lines.iter().enumerate() {
+        for (_index, line) in self.lines.iter().enumerate() {
             let original_line = line.clone();
             let mut line = line.trim().replace("*", "").trim().to_string();
 
@@ -172,24 +172,24 @@ fn md_example(line: String, output: &mut Vec<String>) {
     let heading = line.replace("<caption>", "").replace("</caption>", "").trim().to_string();
     output.push(format!("***Example: {}***", heading));
 
-    let mut example_type = ExampleType::js;
+    let mut example_type = ExampleType::Js;
 
     if heading.to_lowercase().contains("json") {
-        example_type = ExampleType::json;
+        example_type = ExampleType::Json;
     }
 
     if heading.to_lowercase().contains("html") {
-        example_type = ExampleType::html;
+        example_type = ExampleType::Html;
     }
 
     match example_type {
-        ExampleType::js => {
+        ExampleType::Js => {
             output.push("```js".to_string());
         }
-        ExampleType::json => {
+        ExampleType::Json => {
             output.push("```json".to_string());
         }
-        ExampleType::html => {
+        ExampleType::Html => {
             output.push("```html".to_string());
         }
     }

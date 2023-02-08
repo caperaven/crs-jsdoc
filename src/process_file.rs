@@ -49,7 +49,7 @@ pub fn write(file_path: PathBuf, content: String) {
 }
 
 fn ensure_directories_exist(path: PathBuf) -> Result<(), std::io::Error> {
-    let folderPath = path.parent().expect("could not get parent folder for path").to_path_buf();
-    fs::create_dir_all(folderPath)?;
+    let folder_path = path.parent().expect("could not get parent folder for path").to_path_buf();
+    fs::create_dir_all(folder_path)?;
     Ok(())
 }

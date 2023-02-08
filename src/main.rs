@@ -89,7 +89,7 @@ fn process_folder(args_def: &args::Args, path: &str) {
             process_folder(args_def, entry.file_name().to_str().unwrap());
         }
         else {
-            let mut file: String;
+            let file: String;
 
             if path.is_empty() {
                 file = format!("{}\\{}", folder.clone(), entry.file_name().to_str().unwrap());
