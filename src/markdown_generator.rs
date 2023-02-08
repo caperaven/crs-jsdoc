@@ -69,7 +69,7 @@ impl MarkdownGenerator {
             }
 
             if line.starts_with("@class") {
-                md_close_status(&mut output, &self.current_state);
+                self.current_state = md_close_status(&mut output, &self.current_state);
 
                 line = line.replace("@class", "").trim().to_string();
                 md_headings(line.clone(), &mut output, "# class");
@@ -77,7 +77,7 @@ impl MarkdownGenerator {
             }
 
             if line.starts_with("@method") {
-                md_close_status(&mut output, &self.current_state);
+                self.current_state = md_close_status(&mut output, &self.current_state);
 
                 line = line.replace("@method", "").trim().to_string();
                 md_headings(line.clone(), &mut output, "## method");
@@ -85,7 +85,7 @@ impl MarkdownGenerator {
             }
 
             if line.starts_with("@function") {
-                md_close_status(&mut output, &self.current_state);
+                self.current_state = md_close_status(&mut output, &self.current_state);
 
                 line = line.replace("@function", "").trim().to_string();
                 md_headings(line.clone(), &mut output, "## function");
@@ -93,7 +93,7 @@ impl MarkdownGenerator {
             }
 
             if line.starts_with("@param") {
-                md_close_status(&mut output, &self.current_state);
+                self.current_state = md_close_status(&mut output, &self.current_state);
 
                 line = line.replace("@param", "").trim().to_string();
 
@@ -114,7 +114,7 @@ impl MarkdownGenerator {
             }
 
             if line.starts_with("@example") {
-                md_close_status(&mut output, &self.current_state);
+                self.current_state = md_close_status(&mut output, &self.current_state);
 
                 self.current_state = MarkdownGeneratorState::Example;
                 line = line.replace("@example", "").trim().to_string();
@@ -123,7 +123,7 @@ impl MarkdownGenerator {
             }
 
             if line.starts_with("@returns") {
-                md_close_status(&mut output, &self.current_state);
+                self.current_state = md_close_status(&mut output, &self.current_state);
 
                 line = line.replace("@returns", "").trim().to_string();
                 output.push(format!("**Returns**: {}", line));
@@ -131,7 +131,7 @@ impl MarkdownGenerator {
             }
 
             if line.trim().ends_with(":") {
-                md_close_status(&mut output, &self.current_state);
+                self.current_state = md_close_status(&mut output, &self.current_state);
 
                 line = line.replace(":", "").trim().to_string();
                 output.push(format!("## {}", line));
@@ -145,13 +145,19 @@ impl MarkdownGenerator {
     }
 }
 
-fn md_close_status(output: &mut Vec<String>, status: &MarkdownGeneratorState) {
+fn md_close_status(output: &mut Vec<String>, status: &MarkdownGeneratorState) -> MarkdownGeneratorState {
     match status {
         MarkdownGeneratorState::Example => {
             output.push("```".to_string());
+            return MarkdownGeneratorState::None;
         }
         _ => {
-            return;
+            return match status {
+                MarkdownGeneratorState::None => MarkdownGeneratorState::None,
+                MarkdownGeneratorState::Comment => MarkdownGeneratorState::Comment,
+                MarkdownGeneratorState::Parameters => MarkdownGeneratorState::Parameters,
+                MarkdownGeneratorState::Example => MarkdownGeneratorState::Example
+            }
         }
     }
 }
