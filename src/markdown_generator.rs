@@ -130,6 +130,14 @@ impl MarkdownGenerator {
                 continue;
             }
 
+            if line.trim().ends_with(":") {
+                md_close_status(&mut output, &self.current_state);
+
+                line = line.replace(":", "").trim().to_string();
+                output.push(format!("## {}", line));
+                continue;
+            }
+
             output.push(original_line.replace("*", ""));
         }
 

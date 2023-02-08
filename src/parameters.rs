@@ -32,11 +32,22 @@ fn param_from_string(param: &mut Parameters, source: &String) {
     param.param_name = parts[0].trim().to_string();
 
     // description is right side of the first dash
-    param.param_description = parts[1].trim().to_string();
+    if parts.len() > 1 {
+        param.param_description = parts[1].trim().to_string();
+    }
+    else {
+        param.param_description = "-".to_string();
+    }
 }
 
 fn param_type_from_string(param: &mut Parameters, source: &String) -> String {
     param.param_type = extract_value(source, "{", "}").to_string();
+
+    if source.contains("{") == false {
+        param.param_type = "-".to_string();
+        return source.clone();
+    }
+
     let result = source.replace(&format!("{{{}}}", param.param_type), "").trim().to_string();
     result
 }
