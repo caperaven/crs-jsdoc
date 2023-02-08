@@ -64,6 +64,10 @@ impl MarkdownGenerator {
             let original_line = line.clone();
             let mut line = line.trim().replace("*", "").trim().to_string();
 
+            if self.current_state == MarkdownGeneratorState::Parameters && line.trim().len() == 0 {
+                continue;
+            }
+
             if line.starts_with("/") {
                 continue;
             }
@@ -98,10 +102,8 @@ impl MarkdownGenerator {
                 line = line.replace("@param", "").trim().to_string();
 
                 if self.current_state != MarkdownGeneratorState::Parameters {
-                    output.push("\r".to_string());
-                    output.push("***parameters***".to_string());
-                    output.push("\r".to_string());
-                    output.push("|parameter|type|description|required|default|".to_string());
+                    output.push("\r***parameters***".to_string());
+                    output.push("\r|parameter|type|description|required|default|".to_string());
                     output.push("|---------|----|-----------|--------|-------|".to_string());
                 }
 
@@ -126,7 +128,7 @@ impl MarkdownGenerator {
                 self.current_state = md_close_status(&mut output, &self.current_state);
 
                 line = line.replace("@returns", "").trim().to_string();
-                output.push(format!("**Returns**: {}", line));
+                output.push(format!("\r**Returns**: {}", line));
                 continue;
             }
 
@@ -184,7 +186,7 @@ fn md_parameters(line: String, output: &mut Vec<String>) {
 
 fn md_example(line: String, output: &mut Vec<String>) {
     let heading = line.replace("<caption>", "").replace("</caption>", "").trim().to_string();
-    output.push(format!("***Example: {}***", heading));
+    output.push(format!("\r***Example: {}***", heading));
 
     let mut example_type = ExampleType::Js;
 
