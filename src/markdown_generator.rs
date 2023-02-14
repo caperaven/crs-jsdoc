@@ -47,7 +47,7 @@ impl MarkdownGenerator {
             return;
         }
 
-        if line.starts_with("*/") {
+        if line.starts_with("*/") || line.starts_with("**/") {
             self.current_state = MarkdownGeneratorState::None;
             self.lines.push(line.clone());
             return;
@@ -71,6 +71,8 @@ impl MarkdownGenerator {
             }
 
             if line.starts_with("/") {
+                self.current_state = md_close_status(&mut output, &self.current_state);
+                self.current_state = MarkdownGeneratorState::None;
                 continue;
             }
 
@@ -175,6 +177,10 @@ fn md_headings(line: String, output: &mut Vec<String>, heading_text: &str) {
     heading.push(parts[0].trim());
 
     output.push(heading.join(" "));
+
+    if parts.len() > 0 {
+        output.push(parts[1].trim().to_string());
+    }
 }
 
 fn md_parameters(line: String, output: &mut Vec<String>) {

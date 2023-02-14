@@ -53,13 +53,23 @@ fn process_file(args_def: &args::Args) {
 
     let current_dir = env::current_dir().expect("could not get current directory");
     let file_path = current_dir.join(file.clone());
+
+    println!("processing file: {}", file_path.to_str().unwrap());
+
+    match file_path.extension() {
+        None => return,
+        Some(extension) => {
+            if extension != "js" {
+                return;
+            }
+        }
+    }
+
     let mut markdown_generator = MarkdownGenerator::new();
 
     let mut process_line = |line: String| {
         markdown_generator.process_line(line);
     };
-
-    println!("processing file: {}", file_path.to_str().unwrap());
 
     process_file::read(file_path, &mut process_line);
 
