@@ -178,7 +178,7 @@ fn md_headings(line: String, output: &mut Vec<String>, heading_text: &str) {
 
     output.push(heading.join(" "));
 
-    if parts.len() > 0 {
+    if parts.len() > 1 {
         output.push(parts[1].trim().to_string());
     }
 }
