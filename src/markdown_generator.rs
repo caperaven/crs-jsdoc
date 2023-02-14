@@ -39,13 +39,15 @@ impl MarkdownGenerator {
     }
 
     pub fn process_line(&mut self, line: String) {
-        if line.trim().starts_with("/**") {
+        let line = line.trim_start().to_string();
+
+        if line.starts_with("/**") {
             self.current_state = MarkdownGeneratorState::Comment;
             self.lines.push(line.clone());
             return;
         }
 
-        if line.trim().starts_with("*/") {
+        if line.starts_with("*/") {
             self.current_state = MarkdownGeneratorState::None;
             self.lines.push(line.clone());
             return;
