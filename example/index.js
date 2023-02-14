@@ -20,6 +20,6 @@
  *     }
  * }
  */
-function test(firstName, lastName) {
+function test(firstName, lastName = "Doe") {
 
 }

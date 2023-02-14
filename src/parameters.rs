@@ -61,7 +61,12 @@ fn param_default_from_string(param: &mut Parameters, source: &String) -> String 
     let parts = value.split("=").collect::<Vec<&str>>();
 
     param.param_name = parts[0].trim().to_string();
-    param.param_default = parts[1].trim().to_string();
+    param.param_default = String::from("-");
+
+    if parts.len() > 1 {
+        param.param_default = parts[1].trim().to_string();
+    }
+
     param.param_required = false;
 
     let result = source.replace(&format!("[{}]", value), param.param_name.as_str()).trim().to_string();
