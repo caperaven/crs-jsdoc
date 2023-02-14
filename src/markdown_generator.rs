@@ -119,8 +119,8 @@ impl MarkdownGenerator {
 
             if line.starts_with("@example") {
                 self.current_state = md_close_status(&mut output, &self.current_state);
-
                 self.current_state = MarkdownGeneratorState::Example;
+
                 line = line.replace("@example", "").trim().to_string();
                 md_example(line.clone(), &mut output);
                 continue;
@@ -128,6 +128,7 @@ impl MarkdownGenerator {
 
             if line.starts_with("@returns") {
                 self.current_state = md_close_status(&mut output, &self.current_state);
+                self.current_state = MarkdownGeneratorState::Comment;
 
                 line = line.replace("@returns", "").trim().to_string();
                 output.push(format!("\r**Returns**: {}", line));
@@ -136,13 +137,14 @@ impl MarkdownGenerator {
 
             if line.trim().ends_with(":") {
                 self.current_state = md_close_status(&mut output, &self.current_state);
+                self.current_state = MarkdownGeneratorState::Comment;
 
                 line = line.replace(":", "").trim().to_string();
                 output.push(format!("## {}", line));
                 continue;
             }
 
-            output.push(original_line.replace("*", ""));
+            output.push(format!("{}  ", original_line.replace("*", "")));
         }
 
         return output.join("\r");

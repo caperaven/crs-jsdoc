@@ -7,7 +7,8 @@ mod parameters;
 
 use args::{get_args, Args};
 use std::{env, fs};
-use std::fs::DirEntry;
+use std::fs::{DirEntry};
+use std::path::Path;
 use markdown_generator::MarkdownGenerator;
 
 /**
@@ -38,8 +39,6 @@ fn save_file(args_def: &Args, content: String, file: String) {
 
     let file_path = current_dir.join(destination).join(file_name.clone());
 
-    println!("Saving file: {}", file_name);
-
     process_file::write(file_path, content);
 }
 
@@ -59,6 +58,8 @@ fn process_file(args_def: &args::Args) {
     let mut process_line = |line: String| {
         markdown_generator.process_line(line);
     };
+
+    println!("processing file: {}", file_path.to_str().unwrap());
 
     process_file::read(file_path, &mut process_line);
 
@@ -81,12 +82,20 @@ fn process_folder(args_def: &args::Args, path: &str) {
         .join(folder.clone())
         .join(path);
 
-    for entry in fs::read_dir(folder_path).expect("could not read directory") {
+    println!("processing folder: {}", folder_path.to_str().unwrap());
+
+    for entry in fs::read_dir(folder_path).expect("could not read folder") {
+        if !entry.is_ok() {
+            println!("could not read folder entry: {:?}", entry);
+            continue;
+        }
+
         let entry: DirEntry = entry.unwrap();
         let entry_path = entry.path();
 
         if entry_path.is_dir() {
-            process_folder(args_def, entry.file_name().to_str().unwrap());
+            let new_folder = Path::new(path).join(entry.file_name()).to_str().unwrap().to_string();
+            process_folder(args_def, new_folder.as_str());
         }
         else {
             let file: String;
